@@ -14,7 +14,7 @@
 
 ## 前后端配置与运行
 
-需要 JDK 17、Maven、Node.js 20.19+ 或 22.12+，以及已有业务表结构的 MySQL。本目录未提供初始化 SQL。
+需要 JDK 17、Maven、Node.js 20.19+ 或 22.12+，以及已有业务表结构的 MySQL。初始化 SQL 脚本在 insight-link-server/SQL 中。
 
 ### 后端
 
