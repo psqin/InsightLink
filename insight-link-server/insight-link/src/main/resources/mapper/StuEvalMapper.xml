@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.StuEvalMapper">
+
+    <insert id="insert">
+        insert into student_evaluation (material_id, score, content, teacher_user_id)
+        values (#{materialId}, #{score}, #{content},  #{teacherUserId})
+    </insert>
+
+    <update id="update">
+        update student_evaluation
+        <set>
+            score = #{score},
+            evaluation_time = #{evaluationTime},
+            <if test="content != null and content.trim() != ''">
+                content = #{content},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

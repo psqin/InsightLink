@@ -1,0 +1,24 @@
+# 后端本地配置示例，不含真实账号或密钥。
+# 使用前复制为同目录的 application-dev.yml，再填写必填项。
+# application.yml 默认启用 dev；真实配置文件已加入 .gitignore。
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost # 数据库主机，按实际环境填写。
+    port: 3306
+    database: your_database # 必填：已有业务数据库名称。
+    username: your_username # 必填：数据库账号。
+    password: "" # 必填：数据库密码，保留引号可避免 YAML 特殊字符歧义。
+
+  jwt:
+    # 必填：自行生成足够长的随机签名密钥，建议至少 32 字节。
+    # 所有后端实例须保持一致；更换后原登录令牌将失效。
+    # 也可将此值写为 ${JWT_SECRET}，由运行环境提供。
+    admin-secret-key: ""
+
+  alioss:
+    # 使用 OSS 材料上传时填写，实际值仅放在本地配置中。
+    endpoint: "" # OSS 地域访问域名。
+    access-key-id: "" # OSS 访问密钥 ID。
+    access-key-secret: "" # OSS 访问密钥 Secret。
+    bucket-name: "" # 保存材料文件的 Bucket 名称。

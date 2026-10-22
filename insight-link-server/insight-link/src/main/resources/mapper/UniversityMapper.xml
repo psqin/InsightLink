@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.UniversityMapper">
+
+    <select id="query" resultType="com.psqin.domain.entity.Universities">
+        select *
+        from universities
+        <where>
+            <if test="name != null and name != ''">
+                and name like CONCAT('%',#{name},'%')
+            </if>
+        </where>
+        ORDER BY id asc
+        LIMIT 5
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into universities (name, code)
+        values (#{name}, #{code})
+    </insert>
+
+    <update id="update">
+        update universities
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from universities where id = #{id}
+    </delete>
+
+    <select id="pageQuery" resultType="com.psqin.domain.entity.Universities">
+        select id, name, code
+        from universities
+        <where>
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="code != null and code != ''">
+                and code like concat('%', #{code}, '%')
+            </if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

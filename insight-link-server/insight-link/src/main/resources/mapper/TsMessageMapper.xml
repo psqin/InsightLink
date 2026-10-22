@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.TsMessageMapper">
+
+    <insert id="insert">
+        insert into teacher_student_message (sender_id, receiver_id, content)
+        values (#{senderId}, #{receiverId}, #{content})
+    </insert>
+
+    <select id="countTodayStudentMessages" resultType="java.lang.Integer">
+        select count(*)
+        from teacher_student_message m
+        join user u on u.id = m.sender_id
+        where m.receiver_id = #{teacherUserId}
+          and u.role_id = 3
+          and m.send_time <![CDATA[>=]]> #{beginTime}
+          and m.send_time <![CDATA[<]]> #{endTime}
+    </select>
+
+    <select id="listContacts" resultType="com.psqin.domain.vo.UserVO">
+        select u.id,
+               u.username,
+               u.real_name as realName,
+               u.phone,
+               u.avatar,
+               u.role_id as roleId,
+               u.birthday,
+               u.gender,
+               u.email,
+               u.create_time as createTime
+        from user u
+        join (
+            select (case when sender_id = #{userId} then receiver_id else sender_id end) as otherId,
+                   max(send_time) as lastTime
+            from teacher_student_message
+            where sender_id = #{userId} or receiver_id = #{userId}
+            group by (case when sender_id = #{userId} then receiver_id else sender_id end)
+        ) t on t.otherId = u.id
+        order by t.lastTime desc
+    </select>
+
+    <select id="countConversation" resultType="java.lang.Integer">
+        select count(*)
+        from teacher_student_message
+        where (sender_id = #{userId} and receiver_id = #{otherUserId})
+           or (sender_id = #{otherUserId} and receiver_id = #{userId})
+    </select>
+
+    <select id="pageHistory" resultType="com.psqin.domain.entity.TeacherStudentMessage">
+        select *
+        from teacher_student_message
+        where (sender_id = #{userId} and receiver_id = #{otherUserId})
+           or (sender_id = #{otherUserId} and receiver_id = #{userId})
+        order by send_time asc
+    </select>
+
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.StudentMapper">
+
+    <select id="pageQuery" resultType="com.psqin.domain.vo.StudentsPageVO">
+        SELECT
+        s.id AS id,
+        s.user_id AS userId,
+        s.student_no AS studentNo,
+        u.real_name AS realName,
+        u.avatar AS avatar,
+        u.gender AS gender,
+        d1.name AS major,
+        d2.name AS clazz,
+        s.entry_year AS entryYear
+        FROM students s
+        LEFT JOIN user u ON s.user_id = u.id
+        LEFT JOIN sys_dept d1 ON s.major_id = d1.id
+        LEFT JOIN sys_dept d2 ON s.class_id = d2.id
+        <where>
+            <if test="universityId != null">
+                AND s.university_id = #{universityId}
+            </if>
+            <if test="collegeId != null">
+                AND s.college_id = #{collegeId}
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                AND s.student_no LIKE concat('%', #{studentNo}, '%')
+            </if>
+            <if test="majorId != null">
+                AND s.major_id = #{majorId}
+            </if>
+            <if test="classId != null">
+                AND s.class_id = #{classId}
+            </if>
+            <if test="entryYear != null">
+                AND s.entry_year = #{entryYear}
+            </if>
+            <if test="bindStatus != null">
+                AND s.bind_status = #{bindStatus}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="pageQueryAdmin" resultType="com.psqin.domain.vo.StudentVO">
+        select
+        s.id,
+        s.user_id as userId,
+        s.student_no as studentNo,
+        s.university_id as universityId,
+        u.name as universityName,
+        s.college_id as collegeId,
+        c.name as collegeName,
+        s.major_id as majorId,
+        m.name as majorName,
+        s.class_id as classId,
+        cl.name as className,
+        s.entry_year as entryYear,
+        s.bind_status as bindStatus,
+        us.real_name as realName,
+        us.avatar as avatar,
+        us.gender as gender
+        from students s
+        left join universities u on s.university_id = u.id
+        left join sys_dept c on s.college_id = c.id
+        left join sys_dept m on s.major_id = m.id
+        left join sys_dept cl on s.class_id = cl.id
+        left join user us on s.user_id = us.id
+        <where>
+            <if test="realName != null and realName != ''">
+                and us.real_name like concat('%', #{realName}, '%')
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                and s.student_no like concat('%', #{studentNo}, '%')
+            </if>
+            <if test="universityId != null">
+                and s.university_id = #{universityId}
+            </if>
+            <if test="collegeId != null">
+                and s.college_id = #{collegeId}
+            </if>
+            <if test="majorId != null">
+                and s.major_id = #{majorId}
+            </if>
+            <if test="classId != null">
+                and s.class_id = #{classId}
+            </if>
+            <if test="entryYear != null">
+                and s.entry_year = #{entryYear}
+            </if>
+            <if test="bindStatus != null">
+                and s.bind_status = #{bindStatus}
+            </if>
+        </where>
+        order by s.id desc
+    </select>
+
+    <update id="update">
+        update students
+        <set>
+            <if test="studentNo != null and studentNo != ''">student_no = #{studentNo},</if>
+            <if test="universityId != null">university_id = #{universityId},</if>
+            <if test="collegeId != null">college_id = #{collegeId},</if>
+            <if test="majorId != null">major_id = #{majorId},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="entryYear != null">entry_year = #{entryYear},</if>
+            <if test="bindStatus != null">bind_status = #{bindStatus},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from students where id = #{id}
+    </delete>
+
+    <select id="listByUserIds" resultType="com.psqin.domain.entity.Students">
+        select id, user_id as userId, bind_status as bindStatus
+        from students
+        where user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+
+    <update id="updateBindStatusByUserIds">
+        update students
+        set bind_status = #{bindStatus}
+        where user_id in
+        <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </update>
+
+    <select id="getStudentInfoByStudentId" resultType="com.psqin.domain.vo.StudentVO">
+        select
+        s.id,
+        s.user_id as userId,
+        s.student_no as studentNo,
+        s.university_id as universityId,
+        u.name as universityName,
+        s.college_id as collegeId,
+        c.name as collegeName,
+        s.major_id as majorId,
+        m.name as majorName,
+        s.class_id as classId,
+        cl.name as className,
+        s.entry_year as entryYear,
+        s.bind_status as bindStatus,
+        us.real_name as realName,
+        us.avatar as avatar,
+        us.gender as gender
+        from students s
+        left join universities u on s.university_id = u.id
+        left join sys_dept c on s.college_id = c.id
+        left join sys_dept m on s.major_id = m.id
+        left join sys_dept cl on s.class_id = cl.id
+        left join user us on s.user_id = us.id
+        where s.id = #{id}
+    </select>
+</mapper>

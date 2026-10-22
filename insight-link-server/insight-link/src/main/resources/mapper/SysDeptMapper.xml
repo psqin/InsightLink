@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.SysDeptMapper">
+
+    <select id="countValidHierarchy" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM sys_dept d1
+        <if test="majorId != null">
+            JOIN sys_dept d2 ON d2.parent_id = d1.id
+        </if>
+        <if test="classId != null">
+            JOIN sys_dept d3 ON d3.parent_id = d2.id
+        </if>
+        WHERE d1.id = #{collegeId}
+          AND d1.university_id = #{universityId}
+          AND d1.dept_type = 1
+        <if test="majorId != null">
+          AND d2.id = #{majorId}
+          AND d2.university_id = #{universityId}
+          AND d2.dept_type = 2
+        </if>
+        <if test="classId != null">
+          AND d3.id = #{classId}
+          AND d3.university_id = #{universityId}
+          AND d3.dept_type = 3
+        </if>
+    </select>
+
+    <!-- 根据学校查询院系 -->
+    <select id="listCollegesByUniversityId" resultType="com.psqin.domain.entity.SysDept">
+        SELECT id, name, dept_type AS deptType, parent_id AS parentId, university_id AS universityId
+        FROM sys_dept
+        WHERE university_id = #{universityId}
+          AND dept_type = 1
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据院系查询专业 -->
+    <select id="listMajorsByCollegeId" resultType="com.psqin.domain.entity.SysDept">
+        SELECT id, name, dept_type AS deptType, parent_id AS parentId, university_id AS universityId
+        FROM sys_dept
+        WHERE parent_id = #{collegeId}
+          AND dept_type = 2
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据专业查询班级 -->
+    <select id="listClassesByMajorId" resultType="com.psqin.domain.entity.SysDept">
+        SELECT id, name, dept_type AS deptType, parent_id AS parentId, university_id AS universityId
+        FROM sys_dept
+        WHERE parent_id = #{majorId}
+          AND dept_type = 3
+        ORDER BY id ASC
+    </select>
+
+    <select id="getById" resultType="com.psqin.domain.entity.SysDept">
+        SELECT id, name, dept_type AS deptType, parent_id AS parentId, university_id AS universityId
+        FROM sys_dept
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_dept (name, dept_type, parent_id, university_id)
+        VALUES (#{name}, #{deptType}, #{parentId}, #{universityId})
+    </insert>
+
+    <update id="update">
+        UPDATE sys_dept
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="deptType != null">
+                dept_type = #{deptType},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="universityId != null">
+                university_id = #{universityId},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from sys_dept where id = #{id}
+    </delete>
+
+    <select id="countByParentId" resultType="java.lang.Integer">
+        select count(*)
+        from sys_dept
+        where parent_id = #{parentId}
+    </select>
+
+    <select id="pageQuery" resultType="com.psqin.domain.entity.SysDept">
+        SELECT
+            d.id,
+            d.name,
+            d.dept_type AS deptType,
+            d.parent_id AS parentId,
+            d.university_id AS universityId,
+            u.name AS universityName,
+            p.name AS parentName
+        FROM sys_dept d
+        left join universities u on d.university_id = u.id
+        left join sys_dept p on d.parent_id = p.id
+        <where>
+            <if test="universityId != null">
+                and d.university_id = #{universityId}
+            </if>
+            <if test="deptType != null">
+                and d.dept_type = #{deptType}
+            </if>
+            <if test="parentId != null">
+                and d.parent_id = #{parentId}
+            </if>
+            <if test="name != null and name != ''">
+                and d.name like concat('%', #{name}, '%')
+            </if>
+        </where>
+        order by d.id desc
+    </select>
+
+</mapper>

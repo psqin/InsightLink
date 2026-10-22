@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.StuMaterialMapper">
+    <update id="update">
+        update student_material
+        <set>
+            <if test="materialType != null">material_type = #{materialType},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="fileUrl != null and fileUrl != ''">file_url = #{fileUrl},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="pageQuery" resultType="com.psqin.domain.vo.StudentMaterialVO">
+        select sm.*, (case when se.id is null then 0 else 1 end) as evaluated,
+        se.id as evaluation_id, se.score, se.content as evaluation_content, se.evaluation_time, se.teacher_user_id,
+        u.real_name as teacher_real_name
+        from student_material sm
+        left join student_evaluation se on sm.id = se.material_id
+        left join user u on se.teacher_user_id = u.id
+        <where>
+            <if test="studentUserId != null">
+                and sm.student_user_id = #{studentUserId}
+            </if>
+            <if test="materialType != null">
+                and sm.material_type = #{materialType}
+            </if>
+            <if test="title != null and title != ''">
+                and sm.title like concat('%',#{title},'%')
+            </if>
+        </where>
+        order by sm.submit_time desc
+    </select>
+
+    <select id="pageQueryForTeacher" resultType="com.psqin.domain.vo.StuMaterialPageVO">
+        select sm.id,
+        sm.student_user_id as studentUserId,
+        sm.student_user_id as userId,
+        s.student_no as studentNo,
+        su.real_name as studentRealName,
+        sm.material_type as materialType,
+        sm.title,
+        sm.submit_time as submitTime,
+        (case when se.id is null then 0 else 1 end) as evaluated,
+        se.id as evaluationId,
+        se.score,
+        se.evaluation_time as evaluationTime,
+        se.teacher_user_id as teacherUserId,
+        tu.real_name as teacherRealName
+        from student_material sm
+        join ts_guidance tg on tg.student_user_id = sm.student_user_id
+        join students s on s.user_id = sm.student_user_id
+        left join user su on su.id = sm.student_user_id
+        left join student_evaluation se on se.material_id = sm.id
+        left join user tu on tu.id = se.teacher_user_id
+        <where>
+            tg.teacher_user_id = #{teacherId}
+            <if test="dto.materialType != null">
+                and sm.material_type = #{dto.materialType}
+            </if>
+            <if test="dto.studentNo != null and dto.studentNo != ''">
+                and s.student_no like concat('%', #{dto.studentNo}, '%')
+            </if>
+            <if test="dto.realName != null and dto.realName != ''">
+                and su.real_name like concat('%', #{dto.realName}, '%')
+            </if>
+            <if test="dto.majorId != null">
+                and s.major_id = #{dto.majorId}
+            </if>
+            <if test="dto.classId != null">
+                and s.class_id = #{dto.classId}
+            </if>
+            <if test="dto.evaluated != null">
+                and (case when se.id is null then 0 else 1 end) = #{dto.evaluated}
+            </if>
+        </where>
+        order by sm.submit_time desc
+    </select>
+
+    <select id="pageQueryForAdmin" resultType="com.psqin.domain.vo.StuMaterialPageVO">
+        select sm.id,
+        sm.student_user_id as studentUserId,
+        sm.student_user_id as userId,
+        s.student_no as studentNo,
+        su.real_name as studentRealName,
+        sm.material_type as materialType,
+        sm.title,
+        sm.submit_time as submitTime,
+        (case when se.id is null then 0 else 1 end) as evaluated,
+        se.id as evaluationId,
+        se.score,
+        se.evaluation_time as evaluationTime,
+        se.teacher_user_id as teacherUserId,
+        tu.real_name as teacherRealName
+        from student_material sm
+        join students s on s.user_id = sm.student_user_id
+        left join user su on su.id = sm.student_user_id
+        left join student_evaluation se on se.material_id = sm.id
+        left join user tu on tu.id = se.teacher_user_id
+        <where>
+            <if test="dto.materialType != null">
+                and sm.material_type = #{dto.materialType}
+            </if>
+            <if test="dto.universityId != null">
+                and s.university_id = #{dto.universityId}
+            </if>
+            <if test="dto.collegeId != null">
+                and s.college_id = #{dto.collegeId}
+            </if>
+            <if test="dto.studentNo != null and dto.studentNo != ''">
+                and s.student_no like concat('%', #{dto.studentNo}, '%')
+            </if>
+            <if test="dto.realName != null and dto.realName != ''">
+                and su.real_name like concat('%', #{dto.realName}, '%')
+            </if>
+            <if test="dto.majorId != null">
+                and s.major_id = #{dto.majorId}
+            </if>
+            <if test="dto.classId != null">
+                and s.class_id = #{dto.classId}
+            </if>
+            <if test="dto.evaluated != null">
+                and (case when se.id is null then 0 else 1 end) = #{dto.evaluated}
+            </if>
+        </where>
+        order by sm.submit_time desc
+    </select>
+</mapper>

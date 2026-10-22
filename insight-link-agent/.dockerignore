@@ -1,0 +1,17 @@
+.env
+.env.*
+**/.env
+**/.env.*
+.venv
+.git
+.idea
+.runtime
+.pytest_cache
+.ruff_cache
+**/__pycache__
+**/*.py[cod]
+logs
+dist
+tests
+docs
+upload

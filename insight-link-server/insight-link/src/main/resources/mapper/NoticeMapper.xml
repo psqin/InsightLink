@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.NoticeMapper">
+
+    <insert id="insert">
+        insert into system_notice (title, content, publisher_id, type)
+        values (#{title}, #{content}, #{publisherId}, #{type})
+    </insert>
+
+    <delete id="deleteById">
+        delete from system_notice where id = #{id}
+    </delete>
+
+    <update id="update">
+        update system_notice
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="getById" resultType="com.psqin.domain.entity.SystemNotice">
+        select id, title, content, publisher_id as publisherId, publish_time as publishTime, type
+        from system_notice
+        where id = #{id}
+    </select>
+
+    <select id="listByPublisherId" resultType="com.psqin.domain.entity.SystemNotice">
+        select id, title, content, publisher_id as publisherId, publish_time as publishTime, type
+        from system_notice
+        where publisher_id = #{publisherId}
+        order by id desc
+    </select>
+
+    <select id="pageQueryMine" resultType="com.psqin.domain.entity.SystemNotice">
+        select id, title, content, publisher_id as publisherId, publish_time as publishTime, type
+        from system_notice
+        <where>
+            publisher_id = #{publisherId}
+            <if test="title != null and title != ''">
+                and title like concat('%', #{title}, '%')
+            </if>
+            <if test="beginTime != null">
+                and publish_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and publish_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="pageQueryAdmin" resultType="com.psqin.domain.vo.SystemNoticeVO">
+        select n.id, n.title, n.content, n.publisher_id as publisherId, n.publisher_id as userId, u.real_name as publisherRealName,
+        n.publish_time as publishTime, n.type
+        from system_notice n
+        left join user u on n.publisher_id = u.id
+        <where>
+            <if test="publisherRealName != null and publisherRealName != ''">
+                and u.real_name like concat('%', #{publisherRealName}, '%')
+            </if>
+            <if test="beginTime != null">
+                and n.publish_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and n.publish_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by n.publish_time desc, n.id desc
+    </select>
+
+    <select id="getVOById" resultType="com.psqin.domain.vo.SystemNoticeVO">
+        select n.id, n.title, n.content, n.publisher_id as publisherId, n.publisher_id as userId, u.real_name as publisherRealName,
+        n.publish_time as publishTime, n.type
+        from system_notice n
+        left join user u on n.publisher_id = u.id
+        where n.id = #{id}
+    </select>
+
+    <select id="listLatestByTypeAndPublisher" resultType="com.psqin.domain.vo.SystemNoticeVO">
+        select n.id, n.title, n.content, n.publisher_id as publisherId, n.publisher_id as userId, u.real_name as publisherRealName,
+        n.publish_time as publishTime, n.type
+        from system_notice n
+        left join user u on n.publisher_id = u.id
+        <where>
+            n.type = #{type}
+            <if test="publisherId != null">
+                and n.publisher_id = #{publisherId}
+            </if>
+        </where>
+        order by n.publish_time desc, n.id desc
+        limit #{limit}
+    </select>
+
+</mapper>

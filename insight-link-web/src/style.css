@@ -1,0 +1,123 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: block;
+  min-width: 0;
+  min-height: 100vh;
+  background: #f3f4f6;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Element Plus Global Overrides for Beautification */
+:root {
+  --el-color-primary: #3b82f6;
+  --el-color-primary-light-3: #60a5fa;
+  --el-color-primary-light-5: #93c5fd;
+  --el-color-primary-light-7: #bfdbfe;
+  --el-color-primary-light-8: #dbeafe;
+  --el-color-primary-light-9: #eff6ff;
+  --el-color-success: #10b981;
+  --el-color-warning: #f59e0b;
+  --el-color-danger: #ef4444;
+  --el-color-info: #6b7280;
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
+  --el-border-radius-round: 20px;
+  --el-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --el-box-shadow-light: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  --el-border-color-light: #e5e7eb;
+  --el-border-color-lighter: #f3f4f6;
+  --el-text-color-primary: #111827;
+  --el-text-color-regular: #374151;
+  --el-text-color-secondary: #6b7280;
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f9fafb;
+}
+
+/* Global Card & Table Beautification */
+.el-card, .card {
+  border-radius: 12px !important;
+  border: 1px solid rgba(229, 231, 235, 0.5) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease-in-out;
+}
+.el-card:hover, .card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.el-button {
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.el-table th.el-table__cell {
+  background-color: #f9fafb !important;
+  color: #374151;
+  font-weight: 600;
+}
+.el-input__wrapper, .el-select .el-input__wrapper {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+.el-input__wrapper.is-focus, .el-select .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--el-color-primary) inset !important;
+}
+
+/* Custom Modern Notification */
+.modern-message-notification {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  padding: 16px 20px !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.modern-message-notification:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15), 0 10px 12px -6px rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+.modern-message-notification .el-notification__icon {
+  color: var(--el-color-primary) !important;
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+.modern-message-notification .el-notification__title {
+  font-weight: 600 !important;
+  color: var(--el-color-primary) !important;
+  font-size: 16px !important;
+}
+.modern-message-notification .el-notification__content {
+  color: #374151 !important;
+  margin-top: 6px !important;
+  font-size: 14px !important;
+}
+.modern-message-notification .el-notification__closeBtn {
+  color: #9ca3af !important;
+}
+.modern-message-notification .el-notification__closeBtn:hover {
+  color: #ef4444 !important;
+}

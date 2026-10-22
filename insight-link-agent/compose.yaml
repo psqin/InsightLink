@@ -1,0 +1,84 @@
+name: insight-link-agent
+
+services:
+  # 这两个服务只在部署时验证镜像入口；真正的沙箱由 Agent 按任务创建并删除。
+  attachment-image:
+    image: ${ATTACHMENT_SANDBOX_IMAGE:-insight-link-attachment-parser:latest}
+    build: ./sandbox
+    command: ["python", "-c", "import pypdf, docx; print('attachment image ready')"]
+    network_mode: none
+    read_only: true
+    restart: "no"
+
+  analysis-image:
+    image: ${ANALYSIS_SANDBOX_IMAGE:-insight-link-analysis:latest}
+    build: ./sandbox/analysis
+    command: ["python", "-c", "import matplotlib, docx, openpyxl; print('analysis image ready')"]
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=64m
+    restart: "no"
+
+  mongodb:
+    image: ${MONGODB_IMAGE:-mongo:8.0}
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    # MongoDB 不向宿主发布端口；默认仅同一 Compose 网络中的 Agent 可访问。
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand('ping').ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    mem_limit: ${MONGODB_MEMORY_LIMIT:-768m}
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  agent:
+    image: ${AGENT_IMAGE:-insight-link-agent:latest}
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file:
+      - path: ./.env
+    environment:
+      # 容器内通过 socket 连接部署主机，不继承开发机器上的 SSH Context 名称。
+      DOCKER_CONTEXT: default
+      # 一份配置同时保留本机与容器的网络地址；模型、库名和集合前缀共用。
+      JAVA_BASE_URL: ${DOCKER_JAVA_BASE_URL:-http://host.docker.internal:8080}
+      MONGODB_URL: ${DOCKER_MONGODB_URL:-mongodb://mongodb:27017}
+    volumes:
+      - ${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock
+    ports:
+      - "${AGENT_BIND_ADDRESS:-127.0.0.1}:${AGENT_PORT:-8001}:8001"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      attachment-image:
+        condition: service_completed_successfully
+      analysis-image:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=128m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: ${AGENT_MEMORY_LIMIT:-1g}
+    stop_grace_period: 90s
+    logging: *logging
+
+volumes:
+  mongo-data:

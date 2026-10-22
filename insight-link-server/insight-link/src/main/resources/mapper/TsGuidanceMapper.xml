@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.TsGuidanceMapper">
+
+    <insert id="saveByIds">
+        INSERT INTO ts_guidance (teacher_user_id, student_user_id)
+        VALUES
+        <foreach collection="ids" item="studentId" separator=",">
+            (#{teacherId}, #{studentId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByIds">
+        DELETE FROM ts_guidance
+        WHERE teacher_user_id = #{teacherId}
+        AND student_user_id IN
+        <foreach collection="ids" item="studentId" open="(" close=")" separator=",">
+            #{studentId}
+        </foreach>
+    </delete>
+
+    <select id="pageQuery" resultType="com.psqin.domain.vo.StudentsPageVO">
+        SELECT
+        s.id AS id,
+        s.user_id AS userId,
+        s.student_no AS studentNo,
+        u.real_name AS realName,
+        u.avatar AS avatar,
+        u.gender AS gender,
+        d1.name AS major,
+        d2.name AS clazz,
+        s.entry_year AS entryYear,
+        tg.create_time AS createTime
+        FROM ts_guidance tg
+        JOIN students s ON tg.student_user_id = s.user_id
+        LEFT JOIN user u ON s.user_id = u.id
+        LEFT JOIN sys_dept d1 ON s.major_id = d1.id
+        LEFT JOIN sys_dept d2 ON s.class_id = d2.id
+        <where>
+            tg.teacher_user_id = #{teacherId}
+            <if test="dto.studentNo != null and dto.studentNo != ''">
+                AND s.student_no LIKE concat('%', #{dto.studentNo}, '%')
+            </if>
+            <if test="dto.majorId != null">
+                AND s.major_id = #{dto.majorId}
+            </if>
+            <if test="dto.classId != null">
+                AND s.class_id = #{dto.classId}
+            </if>
+            <if test="dto.entryYear != null">
+                AND s.entry_year = #{dto.entryYear}
+            </if>
+        </where>
+        ORDER BY s.entry_year DESC, s.student_no ASC
+    </select>
+    
+    <select id="countByTeacherAndStudent" resultType="java.lang.Integer">
+        SELECT count(*) FROM ts_guidance
+        WHERE teacher_user_id = #{teacherId} AND student_user_id = #{studentUserId}
+    </select>
+
+    <select id="listStudentUserIdsByTeacherAndStudentIds" resultType="java.lang.Long">
+        select student_user_id
+        from ts_guidance
+        where teacher_user_id = #{teacherId}
+        and student_user_id in
+        <foreach collection="studentIds" item="studentId" open="(" close=")" separator=",">
+            #{studentId}
+        </foreach>
+    </select>
+
+    <select id="getTeacherUserIdByStudentUserId" resultType="java.lang.Long">
+        select teacher_user_id
+        from ts_guidance
+        where student_user_id = #{studentUserId}
+        limit 1
+    </select>
+</mapper>

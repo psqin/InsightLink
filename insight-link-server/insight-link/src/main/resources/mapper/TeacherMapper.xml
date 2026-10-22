@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.psqin.mapper.TeacherMapper">
+
+    <insert id="insert">
+        insert into teachers (user_id, teacher_no, university_id, dept_id, title, research_field)
+        values (#{userId}, #{teacherNo}, #{universityId}, #{deptId}, #{title}, #{researchField})
+    </insert>
+
+    <select id="getById" resultType="com.psqin.domain.entity.Teachers">
+        select id,
+        user_id as userId,
+        teacher_no as teacherNo,
+        university_id as universityId,
+        dept_id as deptId,
+        title,
+        research_field as researchField
+        from teachers
+        where user_id = #{userId}
+    </select>
+
+    <select id="getByUserId" resultType="com.psqin.domain.entity.Teachers">
+        select id,
+        user_id as userId,
+        teacher_no as teacherNo,
+        university_id as universityId,
+        dept_id as deptId,
+        title,
+        research_field as researchField
+        from teachers
+        where user_id = #{userId}
+    </select>
+
+    <select id="getEntityById" resultType="com.psqin.domain.entity.Teachers">
+        select id,
+        user_id as userId,
+        teacher_no as teacherNo,
+        university_id as universityId,
+        dept_id as deptId,
+        title,
+        research_field as researchField
+        from teachers
+        where id = #{id}
+    </select>
+
+    <select id="getTeacherInfoByUserId" resultType="com.psqin.domain.vo.TeacherVO">
+        select
+        t.id,
+        t.user_id as userId,
+        us.real_name as realName,
+        us.phone as phone,
+        us.avatar as avatar,
+        us.gender as gender,
+        us.email as email,
+        t.teacher_no as teacherNo,
+        t.university_id as universityId,
+        u.name as universityName,
+        t.dept_id as deptId,
+        d.name as deptName,
+        t.title as title,
+        t.research_field as researchField
+        from teachers t
+        left join universities u on t.university_id = u.id
+        left join sys_dept d on t.dept_id = d.id
+        left join user us on t.user_id = us.id
+        where t.user_id = #{userId}
+    </select>
+
+    <select id="pageQueryAdmin" resultType="com.psqin.domain.vo.TeacherVO">
+        select
+        t.id,
+        t.user_id as userId,
+        us.real_name as realName,
+        us.phone as phone,
+        us.avatar as avatar,
+        us.gender as gender,
+        us.email as email,
+        t.teacher_no as teacherNo,
+        t.university_id as universityId,
+        u.name as universityName,
+        t.dept_id as deptId,
+        d.name as deptName,
+        t.title as title,
+        t.research_field as researchField
+        from teachers t
+        left join universities u on t.university_id = u.id
+        left join sys_dept d on t.dept_id = d.id
+        left join user us on t.user_id = us.id
+        <where>
+            <if test="realName != null and realName != ''">
+                and us.real_name like concat('%', #{realName}, '%')
+            </if>
+            <if test="teacherNo != null and teacherNo != ''">
+                and t.teacher_no like concat('%', #{teacherNo}, '%')
+            </if>
+            <if test="universityId != null">
+                and t.university_id = #{universityId}
+            </if>
+            <if test="deptId != null">
+                and t.dept_id = #{deptId}
+            </if>
+            <if test="title != null and title != ''">
+                and t.title like concat('%', #{title}, '%')
+            </if>
+        </where>
+        order by t.id desc
+    </select>
+
+    <update id="update">
+        update teachers
+        set teacher_no = #{teacherNo},
+        university_id = #{universityId},
+        dept_id = #{deptId},
+        title = #{title},
+        research_field = #{researchField}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from teachers where id = #{id}
+    </delete>
+</mapper>
