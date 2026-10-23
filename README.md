@@ -1,4 +1,4 @@
-# InsightLink｜基于 Harness Engineering 的学业导师 AI 助手
+# InsightLink｜基于 Harness Engineering 的学业导师助手
 
 InsightLink 是基于 **Harness Engineering** 构建的学业导师 Agent 应用，使用 DeepAgents、LangGraph、MCP、中文 Skills、分层记忆和 Docker 沙箱，支持学生材料检索、学情分析、评价草稿与师生沟通。
 
