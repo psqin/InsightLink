@@ -127,9 +127,3 @@ compose.yaml              # Docker一键构建、启动和健康检查
 - LangSmith只接脱敏统计，按用户选择保持关闭。
 
 业务MCP命令：`python -m insight_link_agent.integrations.mcp.server`。Java的`token`仅在请求上下文和本地stdio通道中传递，不进入提示词、检查点、沙箱或追踪。MCP进程共享不意味着共享导师登录态。
-
-## 运行资源
-
-`agent/skills/builtin/*/SKILL.md`、`agent/prompts/*.md` 和 YAML 配置属于模型运行资源，随应用打包，不作为普通文档删除。`uv.lock` 固定运行依赖；修改 `sandbox/` 代码后需要重新构建镜像。
-
-分发源码时只携带脱敏的 `.env.example`，不携带实际 `.env`。`.env` 不进入Docker构建镜像，也不应提交含凭据的配置到仓库。
